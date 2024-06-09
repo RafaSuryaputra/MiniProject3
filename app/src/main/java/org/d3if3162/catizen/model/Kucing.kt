@@ -1,4 +1,4 @@
-package org.d3if3162.mobpro1.model
+package org.d3if3162.catizen.model
 
 data class Kucing(
     val nama: String,

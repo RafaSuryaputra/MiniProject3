@@ -1,4 +1,4 @@
-package org.d3if3162.mobpro1.ui.theme
+package org.d3if3162.catizen.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

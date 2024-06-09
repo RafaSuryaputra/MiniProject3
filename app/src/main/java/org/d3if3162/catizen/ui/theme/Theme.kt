@@ -1,4 +1,4 @@
-package org.d3if3162.mobpro1.ui.theme
+package org.d3if3162.catizen.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -38,7 +38,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun Mobpro1Theme(
+fun CatizenTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

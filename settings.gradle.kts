@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Mobpro 1"
+rootProject.name = "Catizen"
 include(":app")

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "org.d3if3162.mobpro1"
+    namespace = "org.d3if3162.catizen"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "org.d3if3162.mobpro1"
+        applicationId = "org.d3if3162.catizen"
         minSdk = 23
         targetSdk = 34
         versionCode = 1

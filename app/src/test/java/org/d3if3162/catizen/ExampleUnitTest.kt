@@ -1,4 +1,4 @@
-package org.d3if3162.mobpro1
+package org.d3if3162.catizen
 
 import org.junit.Test
 

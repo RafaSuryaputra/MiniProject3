@@ -1,4 +1,4 @@
-package org.d3if3162.mobpro1
+package org.d3if3162.catizen
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

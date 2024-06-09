@@ -1,14 +1,20 @@
+package org.d3if3162.catizen.ui.screen
+
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -16,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,11 +39,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import org.d3if3162.mobpro1.R
-import org.d3if3162.mobpro1.model.Kucing
-import org.d3if3162.mobpro1.network.KucingApi.getKucingUrl
-import org.d3if3162.mobpro1.ui.screen.MainViewModel
-import org.d3if3162.mobpro1.ui.theme.Mobpro1Theme
+import org.d3if3162.catizen.R
+import org.d3if3162.catizen.model.Kucing
+import org.d3if3162.catizen.network.ApiStatus
+import org.d3if3162.catizen.network.KucingApi.getKucingUrl
+import org.d3if3162.catizen.ui.theme.CatizenTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,21 +64,53 @@ fun MainScreen() {
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier) {
+fun ScreenContent(modifier: Modifier ) {
     val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
+    val status by viewModel.status.collectAsState()
 
-    LazyVerticalGrid(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(4.dp),
-        columns = GridCells.Fixed(2)
-    ) {
-        items(data) { cat ->
-            ListItem(kucing = cat)
+    when (status) {
+        ApiStatus.LOADING -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        ApiStatus.SUCCESS -> {
+
+            LazyVerticalGrid(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
+                columns = GridCells.Fixed(2)
+            ) {
+                items(data) { cat -> ListItem(kucing = cat) }
+            }
+        }
+
+        ApiStatus.FAILED -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = stringResource(id = R.string.error))
+                Button(
+                    onClick = { viewModel.retrieveData() },
+                    modifier = Modifier.padding(top = 16.dp),
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                ) {
+                    Text(text = stringResource(id = R.string.try_again))
+                }
+            }
         }
     }
 }
+
+
 
 @Composable
 fun ListItem(kucing: Kucing) {
@@ -115,11 +154,14 @@ fun ListItem(kucing: Kucing) {
     }
 }
 
+
+
+
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun GreetingPreview() {
-    Mobpro1Theme {
+     CatizenTheme{
         MainScreen()
     }
 }

@@ -77,6 +77,10 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.9.3")
     implementation("io.coil-kt:coil-compose:2.4.0")
 
+    implementation("androidx.credentials:credentials:1.2.2")
+    implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.0")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

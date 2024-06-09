@@ -4,4 +4,6 @@
     <string name="error">Gagal memuat data.. Koneksi error.</string>
     <string name="try_again">Coba Lagi</string>
     <string name="profil">Profil</string>
+    <string name="tutup">Tutup</string>
+    <string name="logout">Logout</string>
 </resources>

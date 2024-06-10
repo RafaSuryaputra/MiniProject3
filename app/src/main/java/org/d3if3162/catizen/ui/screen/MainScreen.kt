@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -87,6 +88,8 @@ fun MainScreen() {
     val context = LocalContext.current
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
+    val viewModel: MainViewModel = viewModel()
+    val errorMessage by viewModel.errorMessage
     var showDialog by remember { mutableStateOf(false) }
     var showKucingDialog by remember { mutableStateOf(false) }
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
@@ -138,7 +141,7 @@ fun MainScreen() {
             }
         }
     ) { padding ->
-        ScreenContent(Modifier.padding(padding))
+        ScreenContent(viewModel, Modifier.padding(padding))
         if (showDialog) {
             ProfilDialog(
                 user = user,
@@ -151,7 +154,7 @@ fun MainScreen() {
             KucingDialog(
                 bitmap = bitmap,
                 onDismissRequest = { showKucingDialog = false }) { nama, namaPemilik ->
-                Log.d("TAMBAH", "$nama $namaPemilik ditambahkan.")
+                viewModel.saveData(user.email, nama, namaPemilik, bitmap!!)
                 showKucingDialog = false
             }
         }
@@ -159,7 +162,7 @@ fun MainScreen() {
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier ) {
+fun ScreenContent(viewModel: MainViewModel, modifier: Modifier) {
     val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
     val status by viewModel.status.collectAsState()

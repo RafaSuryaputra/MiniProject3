@@ -7,8 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 
-private const val BASE_URL = "https://raw.githubusercontent.com/" +
-        "RafaSuryaputra/static-api/main/"
+private const val BASE_URL = "https://ghastly-delicate-dragon.ngrok-free.app/API/46-04/static-api-roy/"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())

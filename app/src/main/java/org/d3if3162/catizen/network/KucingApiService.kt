@@ -14,7 +14,8 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 
-private const val BASE_URL = "https://ghastly-delicate-dragon.ngrok-free.app/API/46-04/static-api-roy/"
+//private const val BASE_URL = "https://ghastly-delicate-dragon.ngrok-free.app/API/46-04/static-api-roy/"
+private const val BASE_URL = "http://172.20.10.8:8000"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -26,11 +27,13 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface KucingApiService {
-    @GET("static-api.json")
-    suspend fun getKucing(): List<Kucing>
+    @GET("/kucing")
+    suspend fun getKucing(
+        @Header("Authorization") userId: String
+    ): List<Kucing>
 
     @Multipart
-    @POST("static-api.json")
+    @POST("/bikin-kucing")
     suspend fun postKucing(
         @Header("Authorization") userId: String,
         @Part("nama") nama: RequestBody,
@@ -45,7 +48,7 @@ object KucingApi {
     }
 
     fun getKucingUrl(imageId: String): String {
-        return "$BASE_URL$imageId.jpg"
+        return "$BASE_URL$imageId"
     }
 }
 

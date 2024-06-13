@@ -39,7 +39,7 @@ fun KucingDialog(
     onConfirmation: (String, String) -> Unit
 ) {
     var nama by remember { mutableStateOf("") }
-    var namaLatin by remember { mutableStateOf("") }
+    var namaPemilik by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -69,8 +69,8 @@ fun KucingDialog(
                     modifier = Modifier.padding(top = 8.dp)
                 )
                 OutlinedTextField(
-                    value = namaLatin,
-                    onValueChange = { namaLatin = it },
+                    value = namaPemilik,
+                    onValueChange = { namaPemilik = it },
                     label = { Text(text = stringResource(id = R.string.namaPemilik)) },
                     maxLines = 1,
                     keyboardOptions = KeyboardOptions(
@@ -92,8 +92,8 @@ fun KucingDialog(
                         Text(text = stringResource(R.string.batal))
                     }
                     OutlinedButton(
-                        onClick = { onConfirmation(nama, namaLatin) },
-                        enabled = nama.isNotEmpty() && namaLatin.isNotEmpty(),
+                        onClick = { onConfirmation(nama, namaPemilik) },
+                        enabled = nama.isNotEmpty() && namaPemilik.isNotEmpty(),
                         modifier = Modifier.padding(8.dp)
                     ) {
                         Text(text = stringResource(R.string.simpan))

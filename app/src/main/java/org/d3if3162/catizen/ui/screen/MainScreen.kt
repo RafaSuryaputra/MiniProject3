@@ -10,20 +10,25 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
@@ -36,6 +41,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,12 +106,36 @@ fun MainScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(id = R.string.app_name)) },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    )
+                    {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo),
+                            contentDescription = stringResource(
+                                id = R.string.app_name),
+                            modifier = Modifier
+                                .height(50.dp)
+                                .width(50.dp)
+                                .padding(end = 10.dp),
+                        )
+                        Text(text = stringResource(id = R.string.app_name))
+                    }
+                        },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary
+                    containerColor = Color(0xFF0098EB),
+                    titleContentColor = Color.White
                 ),
                 actions = {
+                    IconButton(onClick = { viewModel.retrieveData(user.email) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = stringResource(id = R.string.refresh),
+                            tint = Color.White
+                        )
+                    }
                     IconButton(onClick = {
                         if (user.email.isEmpty()) {
                             CoroutineScope(Dispatchers.IO).launch { signIn(context, dataStore) }
@@ -117,14 +147,14 @@ fun MainScreen() {
                         Icon(
                             painter = painterResource(R.drawable.account_circle_24),
                             contentDescription = stringResource(R.string.profil),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Color.White
                         )
                     }
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
+            FloatingActionButton(containerColor = Color(0xFF0098EB), onClick = {
                 val options = CropImageContractOptions(
                     null, CropImageOptions(
                         imageSourceIncludeGallery = false,
@@ -136,12 +166,13 @@ fun MainScreen() {
             }) {
                 Icon(
                     imageVector = Icons.Default.Add,
+                    tint = Color.White,
                     contentDescription = stringResource(id = R.string.tambah_hewan)
                 )
             }
         }
     ) { padding ->
-        ScreenContent(viewModel, Modifier.padding(padding))
+        ScreenContent(viewModel, user.email, Modifier.padding(padding))
         if (showDialog) {
             ProfilDialog(
                 user = user,
@@ -162,10 +193,20 @@ fun MainScreen() {
 }
 
 @Composable
-fun ScreenContent(viewModel: MainViewModel, modifier: Modifier) {
+fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) {
     val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
+
+    Image(
+        painter = painterResource(id = R.drawable.logo),
+        contentDescription = "logo",
+        modifier = modifier.fillMaxSize().padding(16.dp),
+    )
+
+    LaunchedEffect(userId) {
+        viewModel.retrieveData(userId)
+    }
 
     when (status) {
         ApiStatus.LOADING -> {
@@ -173,7 +214,7 @@ fun ScreenContent(viewModel: MainViewModel, modifier: Modifier) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = Color(0xFFFFFFFF))
             }
         }
 
@@ -198,7 +239,7 @@ fun ScreenContent(viewModel: MainViewModel, modifier: Modifier) {
             ) {
                 Text(text = stringResource(id = R.string.error))
                 Button(
-                    onClick = { viewModel.retrieveData() },
+                    onClick = { viewModel.retrieveData(userId) },
                     modifier = Modifier.padding(top = 16.dp),
                     contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
                 ) {

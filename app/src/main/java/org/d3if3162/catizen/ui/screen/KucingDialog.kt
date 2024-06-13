@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.d3if3162.catizen.R
 import org.d3if3162.catizen.ui.theme.CatizenTheme
 
@@ -36,8 +37,9 @@ import org.d3if3162.catizen.ui.theme.CatizenTheme
 fun KucingDialog(
     bitmap: Bitmap?,
     onDismissRequest: () -> Unit,
-    onConfirmation: (String, String) -> Unit
+    onConfirmation: (String, String, String, Int) -> Unit
 ) {
+    val viewModel: MainViewModel = viewModel()
     var nama by remember { mutableStateOf("") }
     var namaPemilik by remember { mutableStateOf("") }
 
@@ -48,7 +50,7 @@ fun KucingDialog(
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
                     bitmap = bitmap!!.asImageBitmap(),
@@ -92,7 +94,10 @@ fun KucingDialog(
                         Text(text = stringResource(R.string.batal))
                     }
                     OutlinedButton(
-                        onClick = { onConfirmation(nama, namaPemilik) },
+                        onClick = {
+                            val id = viewModel.getNextId()
+                            onConfirmation(id, nama, namaPemilik, 1)
+                        },
                         enabled = nama.isNotEmpty() && namaPemilik.isNotEmpty(),
                         modifier = Modifier.padding(8.dp)
                     ) {
@@ -111,8 +116,8 @@ fun AddDialogPreview() {
     CatizenTheme {
         KucingDialog(
             bitmap = null,
-            onDismissRequest = {},
-            onConfirmation = { _, _ -> }
+            onDismissRequest = { },
+            onConfirmation = { _, _, _, _ -> }
         )
     }
 }

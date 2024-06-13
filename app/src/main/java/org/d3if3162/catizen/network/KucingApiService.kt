@@ -8,14 +8,18 @@ import org.d3if3162.catizen.model.Kucing
 import org.d3if3162.catizen.model.OpStatus
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Query
 
-//private const val BASE_URL = "https://ghastly-delicate-dragon.ngrok-free.app/API/46-04/static-api-roy/"
-private const val BASE_URL = "http://172.20.10.8:8000"
+// private const val BASE_URL = " IPv4 Address kalian + :8000" untuk jalanin local dengan laravel
+
+// untuk menyalakan server laravel dengan ngtok menggunakan : ngrok.exe http http://localhost:8000
+private const val BASE_URL = "https://f8b8-140-213-45-62.ngrok-free.app"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -36,9 +40,18 @@ interface KucingApiService {
     @POST("/bikin-kucing")
     suspend fun postKucing(
         @Header("Authorization") userId: String,
+        @Part("id") id: RequestBody,
         @Part("nama") nama: RequestBody,
         @Part("namaPemilik") namaPemilik: RequestBody,
+        @Part("isUserInputted") isUserInputted: Int,
         @Part image: MultipartBody.Part
+    ): OpStatus
+
+
+    @DELETE("/hapus-kucing")
+    suspend fun deleteHewan(
+        @Header("Authorization") userId: String,
+        @Query("id") id: String
     ): OpStatus
 }
 
@@ -50,6 +63,5 @@ object KucingApi {
     fun getKucingUrl(imageId: String): String {
         return "$BASE_URL$imageId"
     }
+    enum class ApiStatus {LOADING, SUCCESS, FAILED}
 }
-
-enum class ApiStatus {LOADING, SUCCESS, FAILED}

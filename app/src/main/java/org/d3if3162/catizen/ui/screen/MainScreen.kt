@@ -28,7 +28,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
@@ -79,7 +81,6 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingExcept
 import org.d3if3162.catizen.R
 import org.d3if3162.catizen.model.Kucing
 import org.d3if3162.catizen.model.User
-import org.d3if3162.catizen.network.ApiStatus
 import org.d3if3162.catizen.network.KucingApi.getKucingUrl
 import org.d3if3162.catizen.network.UserDataStore
 import org.d3if3162.catizen.ui.theme.CatizenTheme
@@ -87,6 +88,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.d3if3162.catizen.BuildConfig
+import org.d3if3162.catizen.network.KucingApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,17 +186,20 @@ fun MainScreen() {
         if (showKucingDialog) {
             KucingDialog(
                 bitmap = bitmap,
-                onDismissRequest = { showKucingDialog = false }) { nama, namaPemilik ->
-                viewModel.saveData(user.email, nama, namaPemilik, bitmap!!)
+                onDismissRequest = { showKucingDialog = false }) { id, nama, namaPemilik, mine ->
+                viewModel.saveData(user.email, id, nama, namaPemilik, 1, bitmap!!)
                 showKucingDialog = false
             }
+        }
+        if (errorMessage != null) {
+            Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+            viewModel.clearMessage()
         }
     }
 }
 
 @Composable
 fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) {
-    val viewModel: MainViewModel = viewModel()
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
@@ -209,7 +214,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
     }
 
     when (status) {
-        ApiStatus.LOADING -> {
+        KucingApi.ApiStatus.LOADING -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -218,7 +223,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
             }
         }
 
-        ApiStatus.SUCCESS -> {
+        KucingApi.ApiStatus.SUCCESS -> {
 
             LazyVerticalGrid(
                 modifier = modifier
@@ -231,7 +236,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
             }
         }
 
-        ApiStatus.FAILED -> {
+        KucingApi.ApiStatus.FAILED -> {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
@@ -252,6 +257,13 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier) 
 
 @Composable
 fun ListItem(kucing: Kucing) {
+    val context = LocalContext.current
+    val dataStore = UserDataStore(context)
+    val user by dataStore.userFlow.collectAsState(User())
+    val viewModel: MainViewModel = viewModel()
+
+    val showDialog = remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .padding(4.dp)
@@ -271,6 +283,44 @@ fun ListItem(kucing: Kucing) {
                 .fillMaxWidth()
                 .padding(4.dp)
         )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            if (kucing.mine == 1) {
+                IconButton(
+                    onClick = { showDialog.value = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(id = R.string.delete),
+                        tint = Color.White
+                    )
+                }
+            }
+        }
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDialog.value = false },
+                title = { Text(text = stringResource(id = R.string.confirm)) },
+                text = { Text(text = stringResource(id = R.string.confirm_delete_text)) },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showDialog.value = false
+                            viewModel.deleteData(user.email, kucing.id)
+                        }
+                    ) {
+                        Text(text = stringResource(id = R.string.delete))
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDialog.value = false }) {
+                        Text(text = stringResource(id = R.string.batal))
+                    }
+                }
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()

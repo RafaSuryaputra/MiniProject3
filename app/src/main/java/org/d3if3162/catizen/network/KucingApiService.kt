@@ -19,7 +19,7 @@ import retrofit2.http.Query
 // private const val BASE_URL = " IPv4 Address kalian + :8000" untuk jalanin local dengan laravel
 
 // untuk menyalakan server laravel dengan ngtok menggunakan : ngrok.exe http http://localhost:8000
-private const val BASE_URL = "https://f8b8-140-213-45-62.ngrok-free.app"
+private const val BASE_URL = "https://3975-2404-8000-1024-1a47-6c1f-8b6d-decc-399.ngrok-free.app"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
